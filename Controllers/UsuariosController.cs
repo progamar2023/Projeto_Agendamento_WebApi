@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebApi.Models;
@@ -80,7 +81,20 @@ namespace WebApi.Controllers
             return CreatedAtAction("GetUsuario", new { id = usuario.Id }, usuario);
         }
 
-       
+        [HttpPost("Login")]
+        public async Task<ActionResult<Usuario>> Login(Login login)
+        {
+            var usuario = await _context.Usuarios.Where(x => x.Email == login.Email && x.Senha == login.Senha).FirstAsync();
+
+            if (usuario == null)
+            {
+                return NotFound();
+            }
+
+            return usuario;
+        }
+
+
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUsuario(int id)
         {
