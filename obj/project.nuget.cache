@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "y9VHqHKaLzsiXc+asCsBUy8A7aShRNQC/iijfSIKUokAgdY8oanWfsD/kFj7uy6QFaILqEEymaDvYzhotQaYEw==",
+  "dgSpecHash": "xPw81ukzlQfI7O3PGnbhELWokRFz8eppBRYCfZMDbNRYEIt5G+wE+AyoubdNAuYM3FqYLl9AXMqL/R19w5E0fg==",
   "success": true,
-  "projectFilePath": "C:\\Users\\danie\\OneDrive\\Documentos\\Projetos 2023\\Projetos_Angular\\Api\\WebApi\\WebApi.csproj",
+  "projectFilePath": "C:\\Users\\danie\\OneDrive\\Documentos\\Projetos 2023\\Projetos_Angular\\Documentos\\API\\Projeto_Agendamento_WebApi\\WebApi.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\danie\\.nuget\\packages\\humanizer.core\\2.14.1\\humanizer.core.2.14.1.nupkg.sha512",
     "C:\\Users\\danie\\.nuget\\packages\\messagepack\\2.1.152\\messagepack.2.1.152.nupkg.sha512",
