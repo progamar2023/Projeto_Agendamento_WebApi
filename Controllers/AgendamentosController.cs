@@ -82,6 +82,7 @@ namespace WebApi.Controllers
         [HttpPost]
         public async Task<ActionResult<Agendamento>> PostAgendamento(Agendamento agendamento)
         {
+            agendamento.Status = 0;
             _context.Agendamentos.Add(agendamento);
             await _context.SaveChangesAsync();
 
