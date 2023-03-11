@@ -8,5 +8,7 @@
         public string? Tipo { get; set; }
         public string? Descricao { get; set; }
         public string? Valor { get; set; }
+        public TimeSpan? DataInicial { get; set; }
+        public TimeSpan? DataFinal { get; set; }
     }
 }
