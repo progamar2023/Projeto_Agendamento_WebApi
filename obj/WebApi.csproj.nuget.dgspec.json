@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\danie\\OneDrive\\Documentos\\Projetos 2023\\Projetos_Angular\\Documentos\\API\\Projeto_Agendamento_WebApi\\WebApi.csproj": {}
+    "C:\\Users\\danie\\Downloads\\API\\Projeto_Agendamento_WebApi\\WebApi.csproj": {}
   },
   "projects": {
-    "C:\\Users\\danie\\OneDrive\\Documentos\\Projetos 2023\\Projetos_Angular\\Documentos\\API\\Projeto_Agendamento_WebApi\\WebApi.csproj": {
+    "C:\\Users\\danie\\Downloads\\API\\Projeto_Agendamento_WebApi\\WebApi.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\danie\\OneDrive\\Documentos\\Projetos 2023\\Projetos_Angular\\Documentos\\API\\Projeto_Agendamento_WebApi\\WebApi.csproj",
+        "projectUniqueName": "C:\\Users\\danie\\Downloads\\API\\Projeto_Agendamento_WebApi\\WebApi.csproj",
         "projectName": "WebApi",
-        "projectPath": "C:\\Users\\danie\\OneDrive\\Documentos\\Projetos 2023\\Projetos_Angular\\Documentos\\API\\Projeto_Agendamento_WebApi\\WebApi.csproj",
+        "projectPath": "C:\\Users\\danie\\Downloads\\API\\Projeto_Agendamento_WebApi\\WebApi.csproj",
         "packagesPath": "C:\\Users\\danie\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\danie\\OneDrive\\Documentos\\Projetos 2023\\Projetos_Angular\\Documentos\\API\\Projeto_Agendamento_WebApi\\obj\\",
+        "outputPath": "C:\\Users\\danie\\Downloads\\API\\Projeto_Agendamento_WebApi\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\danie\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -40,6 +40,10 @@
         "net6.0": {
           "targetAlias": "net6.0",
           "dependencies": {
+            "Grpc.Core": {
+              "target": "Package",
+              "version": "[2.46.6, )"
+            },
             "Microsoft.AspNet.WebApi.Cors": {
               "target": "Package",
               "version": "[5.2.9, )"

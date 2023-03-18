@@ -10,6 +10,10 @@ using Microsoft.EntityFrameworkCore;
 using WebApi.Models;
 using IHostingEnvironment = Microsoft.AspNetCore.Hosting.IHostingEnvironment;
 using Microsoft.Extensions.Hosting;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using static System.Collections.Specialized.BitVector32;
+using Microsoft.Extensions.Hosting.Internal;
+using System.ComponentModel;
 
 namespace WebApi.Controllers
 {
@@ -19,18 +23,21 @@ namespace WebApi.Controllers
     {
         private readonly AppDbContext _context;
         private readonly IHostingEnvironment _environment;
+        private readonly IHttpContextAccessor _contextAccessor;
 
-        public ServicosController(AppDbContext context, IHostingEnvironment env)
+        public ServicosController(AppDbContext context, IHostingEnvironment env, IHttpContextAccessor contextAccessor)
         {
             _context = context;
             _environment = env;
+            _contextAccessor = contextAccessor;
         }
 
-        /*
-        [HttpPost]
+
+        // [HttpPost("Save")]
+        [NonAction]
         public void SaveImage(string base64img, string outputImgFilename = "image.jpg")
         {
-            var folderPath = System.IO.Path.Combine(_env.ContentRootPath, "Upload");
+            var folderPath = System.IO.Path.Combine(_environment.ContentRootPath, "Upload");
             if (!Directory.Exists(folderPath))
             {
                Directory.CreateDirectory(folderPath);
@@ -38,96 +45,39 @@ namespace WebApi.Controllers
             System.IO.File.WriteAllBytes(Path.Combine(folderPath, outputImgFilename), Convert.FromBase64String(base64img));
         }
 
-        [Route("api/dashboard/GetImage")]
-        public byte[] GetImage(int componentId)
+        [HttpGet("GetImage")]
+        public string GetImage(string? foto = "")
         {
-            using (var dashboardService = new Servico())
-            {
-                var component = dashboardService.GetImage(componentId);
-                var context = HttpContext.Current;
-                string filePath = context.Server.MapPath("~/Images/" + component.ImageName);
-                context.Response.ContentType = "image/jpeg";
-                using (FileStream fileStream = new FileStream(filePath, FileMode.Open))
-                {
-                    using (var memoryStream = new MemoryStream())
-                    {
-                        fileStream.CopyTo(memoryStream);
-                        Bitmap image = new Bitmap(1, 1);
-                        image.Save(memoryStream, ImageFormat.Jpeg);
+          
+                 var component = foto;
+                 var folderPath = System.IO.Path.Combine(_environment.ContentRootPath, "Upload");
 
-                        byte[] byteImage = memoryStream.ToArray();
-                        return byteImage;
+                 string filePath = Path.Combine(folderPath, component);
+
+                    if (System.IO.File.Exists(filePath))
+                    {
+
+                        using (FileStream fileStream = new FileStream(filePath, FileMode.Open))
+                        {
+                            using (var memoryStream = new MemoryStream())
+                            {
+                                fileStream.CopyTo(memoryStream);
+                                Bitmap image = new Bitmap(1, 1);
+                                image.Save(memoryStream, ImageFormat.Jpeg);
+
+                                byte[] byteImage = memoryStream.ToArray();
+                                string value = System.Convert.ToBase64String(byteImage);
+                                return value;
+                            }
+                        }
+                    } 
+                    else
+                    {
+                         return "";
                     }
-                }
-            }
         }
 
-        */
-
-        [NonAction]
-        private string GetFilePath(string codigo)
-        {
-            return this._environment.WebRootPath + "\\Upload\\" + codigo + DateTime.Now;
-        }
-
-        [HttpPost("UploadImage")]
-        public async Task<ActionResult> UploadImage()
-        {
-            bool Results = false;
-            try
-            {
-                var _uploadedfiles = Request.Form.Files;
-                foreach (IFormFile source in _uploadedfiles)
-                {
-                    string Filename = source.FileName;
-                    string Filepath = GetFilePath(Filename);
-
-                    if (!System.IO.Directory.Exists(Filepath))
-                    {
-                        System.IO.Directory.CreateDirectory(Filepath);
-                    }
-
-                    string imagepath = Filepath + "\\image.png";
-
-                    if (System.IO.File.Exists(imagepath))
-                    {
-                        System.IO.File.Delete(imagepath);
-                    }
-                    using (FileStream stream = System.IO.File.Create(imagepath))
-                    {
-                        await source.CopyToAsync(stream);
-                        Results = true;
-                    }
-
-
-                }
-            }
-            catch (Exception ex)
-            {
-
-            }
-            return Ok(Results);
-        }
-
-
-        [NonAction]
-        private string GetImagebyProduct(string productcode)
-        {
-            string ImageUrl = string.Empty;
-            string HostUrl = "https://localhost:7118/";
-            string Filepath = GetFilePath(productcode);
-            string Imagepath = Filepath + "\\image.png";
-            if (!System.IO.File.Exists(Imagepath))
-            {
-                ImageUrl = HostUrl + "/uploads/common/noimage.png";
-            }
-            else
-            {
-                ImageUrl = HostUrl + "/upload/" + productcode + DateTime.Now + "/image.png";
-            }
-            return ImageUrl;
-
-        }
+        
 
 
         [HttpGet]
@@ -155,6 +105,11 @@ namespace WebApi.Controllers
                         }).ToList();
             foreach(var servico in query)
             {
+                if (servico.Servico.Imagem != null)
+                {
+                    servico.ImagemBase64 = GetImage(servico.Servico.Imagem);
+                }
+              
                 servicosRequest.Add(servico);
             }
             return servicosRequest;
@@ -176,14 +131,40 @@ namespace WebApi.Controllers
 
         
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutServico(int id, Servico servico)
+        public async Task<IActionResult> PutServico(int id, ServicoImagemRequest servico)
         {
+
+    
             if (id != servico.Id)
             {
                 return BadRequest();
             }
 
-            _context.Entry(servico).State = EntityState.Modified;
+            if(servico.ImagemBase64 != null)
+            {
+              var identificador = Guid.NewGuid();
+               var nome = identificador + ".png";
+             
+              
+
+                if (GetImage(servico.Imagem) != "")
+                {
+                    var folderPath = System.IO.Path.Combine(_environment.ContentRootPath, "Upload");
+
+                    string filePath = Path.Combine(folderPath, servico.Imagem);
+
+                    System.IO.File.Delete(filePath);
+                }
+
+                SaveImage(servico.ImagemBase64, nome);
+
+                servico.Imagem = nome;
+                servico.ImagemBase64 = null;
+            }
+
+            Servico servicosReq = new Servico(servico.Id, servico.Nome, servico.Descricao, servico.Imagem, servico.TipoServicoId, servico.DataCriacao, true);
+
+            _context.Entry(servicosReq).State = EntityState.Modified;
 
             try
             {
@@ -201,24 +182,45 @@ namespace WebApi.Controllers
                 }
             }
 
-            return Ok(servico);
+            return Ok(servicosReq);
         }
 
         
         [HttpPost]
-        public async Task<ActionResult<Servico>> PostServico(Servico servico)
+        public async Task<ActionResult<Servico>> PostServico(ServicoImagemRequest servico)
         {
-            _context.Servicos.Add(servico);
+           
+                var identificador = Guid.NewGuid();
+                var nome = identificador + ".png";
+                SaveImage(servico.ImagemBase64, nome);
+
+                servico.Imagem = nome;
+                servico.ImagemBase64 = null;
+                Servico servicosReq = new Servico(servico.Id, servico.Nome, servico.Descricao, nome, servico.TipoServicoId, servico.DataCriacao, true);
+                _context.Servicos.Add(servicosReq);
+
+            
+           
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetServico", new { id = servico.Id }, servico);
+            return CreatedAtAction("GetServico", new { id = servicosReq.Id }, servicosReq);
         }
 
        
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteServico(int id)
         {
+
             var servico = await _context.Servicos.FindAsync(id);
+
+            if (GetImage(servico.Imagem) != "")
+            {
+                var folderPath = System.IO.Path.Combine(_environment.ContentRootPath, "Upload");
+
+                string filePath = Path.Combine(folderPath, servico.Imagem);
+
+                System.IO.File.Delete(filePath);
+            }
             if (servico == null)
             {
                 return NotFound();
